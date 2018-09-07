@@ -213,6 +213,31 @@ abstract class Crop
         return $this->originalImage;
     }
 
+	/**
+	 * Resize and get offsets for crop
+	 *
+	 * @param $targetWidth
+	 * @param $targetHeight
+	 *
+	 * @return array
+	 *
+	 * @author Léonard Phoumpakka
+	 *
+	 */
+	public function get_offset_resize_for_crop($targetWidth, $targetHeight)
+	{
+		if ($this->getAutoOrient()) {
+			$this->autoOrient();
+		}
+
+		// First get the size that we can use to safely trim down the image without cropping any sides
+		$crop = $this->getSafeResizeOffset($this->originalImage, $targetWidth, $targetHeight);
+		// Resize the image
+		$this->originalImage->resizeImage($crop['width'], $crop['height'], $this->getFilter(), $this->getBlur());
+		// Get the offset for cropping the image further
+		return $this->getSpecialOffset($this->originalImage, $targetWidth, $targetHeight);
+	}
+
     /**
      * Returns width and height for resizing the image, keeping the aspect ratio
      * and allow the image to be larger than either the width or height
